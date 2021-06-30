@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Doctrine\UserSetIsMvpListener;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
@@ -35,6 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiFilter(PropertyFilter::class)
  * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
+ * @ORM\EntityListeners({UserSetIsMvpListener::class})
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
 class User implements UserInterface
@@ -99,6 +101,13 @@ class User implements UserInterface
      * @Groups({"user:read"})
      */
     private $isMe = false;
+
+    /**
+     * Returns true if this user is an MVP
+     * 
+     * @Groups({"user:read"})
+     */
+    private $isMvp = false;
 
     public function __construct()
     {
@@ -265,4 +274,14 @@ class User implements UserInterface
     {
         $this->isMe = $isMe;
     }
+
+    public function getIsMvp(): bool 
+    {
+        return $this->isMvp;
+    }
+
+    public function setIsMvp(bool $isMvp)
+    {
+        $this->isMvp = $isMvp;
+    }    
 }
