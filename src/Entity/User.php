@@ -98,7 +98,7 @@ class User implements UserInterface
      * 
      * @Groups({"user:read"})
      */
-    private $isMe;
+    private $isMe = false;
 
     public function __construct()
     {
@@ -258,10 +258,6 @@ class User implements UserInterface
 
     public function getIsMe(): bool 
     {
-        if ($this->isMe === null) {
-            throw new \LogicException('The isMe field has not been initialized');
-        }
-        
         return $this->isMe;
     }
 
