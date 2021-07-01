@@ -10,13 +10,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ApiResource(
  *    normalizationContext={"groups"={"daily-stats:read"}},
+ *    paginationItemsPerPage=7,
  *    itemOperations={
- *        "get"={
- *             "method"="GET",
- *             "controller"=NotFoundAction::class,
- *             "read"=false,
- *             "output"=false,
- *        }
+ *        "get"={}
  *    },
  *    collectionOperations={"get"}
  * )
