@@ -2,14 +2,15 @@
 
 namespace App\DataProvider;
 
-use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
+use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use App\ApiPlatform\DailyStatsDateFilter;
 use App\Entity\DailyStats;
 use App\Service\StatsHelper;
 
-class DailyStatsProvider implements CollectionDataProviderInterface, ItemDataProviderInterface, RestrictedDataProviderInterface
+class DailyStatsProvider implements ContextAwareCollectionDataProviderInterface, ItemDataProviderInterface, RestrictedDataProviderInterface
 {
 
   private $statsHelper;
@@ -21,16 +22,24 @@ class DailyStatsProvider implements CollectionDataProviderInterface, ItemDataPro
       $this->pagination = $pagination;
   }
 
-  public function getCollection(string $resourceClass, string $operationName = null)
+  public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
   {
         list($page, $offset, $limit) = $this->pagination
             ->getPagination($resourceClass, $operationName);
 
-        return new DailyStatsPaginator(
+        $paginator = new DailyStatsPaginator(
             $this->statsHelper,
             $page,
             $limit
         );
+                    
+        $fromDate = $context[DailyStatsDateFilter::FROM_FILTER_CONTEXT] ?? null;
+
+        if ($fromDate) {
+            $paginator->setFromDate($fromDate);
+        }
+
+        return $paginator;
   }
 
   public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
