@@ -6,7 +6,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use App\Entity\DailyStats;
 use Psr\Log\LoggerInterface;
 
-class DailyStatsPersister implements DataPersisterInterface
+class DailyStatsDataPersister implements DataPersisterInterface
 {
     private $logger;
     
