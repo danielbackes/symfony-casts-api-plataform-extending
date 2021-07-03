@@ -7,9 +7,10 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use App\ApiPlatform\CheeseSearchFilter;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use App\Validator\IsValidOwner;
+use App\Dto\CheeseListingOutput;
 use App\Validator\ValidIsPublished;
 use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,6 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
+ *     output=CheeseListingOutput::CLASS,
  *     normalizationContext={"groups"={"cheese:read"}},
  *     denormalizationContext={"groups"={"cheese:write"}},
  *     itemOperations={
@@ -69,7 +71,7 @@ class CheeseListing
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"cheese:read", "cheese:write", "user:read", "user:write"})
+     * @Groups({"cheese:write", "user:write"})
      * @Assert\NotBlank()
      * @Assert\Length(
      *     min=2,
@@ -81,7 +83,6 @@ class CheeseListing
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"cheese:read"})
      * @Assert\NotBlank()
      */
     private $description;
@@ -90,7 +91,7 @@ class CheeseListing
      * The price of this delicious cheese, in cents
      *
      * @ORM\Column(type="integer")
-     * @Groups({"cheese:read", "cheese:write", "user:read", "user:write"})
+     * @Groups({"cheese:write", "user:write"})
      * @Assert\NotBlank()
      */
     private $price;
@@ -109,7 +110,7 @@ class CheeseListing
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="cheeseListings")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"cheese:read", "cheese:collection:post"})
+     * @Groups({"cheese:collection:post"})
      * @IsValidOwner()
      */
     private $owner;
@@ -133,18 +134,6 @@ class CheeseListing
     public function getDescription(): ?string
     {
         return $this->description;
-    }
-
-    /**
-     * @Groups("cheese:read")
-     */
-    public function getShortDescription(): ?string
-    {
-        if (strlen($this->description) < 40) {
-            return $this->description;
-        }
-
-        return substr($this->description, 0, 40).'...';
     }
 
     public function setDescription(string $description): self
@@ -182,16 +171,6 @@ class CheeseListing
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
-    }
-
-    /**
-     * How long ago in text that this cheese listing was added.
-     *
-     * @Groups("cheese:read")
-     */
-    public function getCreatedAtAgo(): string
-    {
-        return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
     public function getIsPublished(): ?bool
