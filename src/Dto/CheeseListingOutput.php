@@ -2,6 +2,8 @@
 
 namespace App\Dto;
 
+use App\Entity\CheeseListing;
+use App\Entity\User;
 use Carbon\Carbon;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -57,4 +59,14 @@ class CheeseListingOutput
         return Carbon::instance($this->createdAt)->diffForHumans();
     }
 
+    public static function createFromEntity(CheeseListing $cheeseListing): self
+    {
+        $output = new CheeseListingOutput();
+        $output->title = $cheeseListing->getTitle();
+        $output->description = $cheeseListing->getDescription();
+        $output->price = $cheeseListing->getPrice();
+        $output->owner = $cheeseListing->getOwner();
+        $output->createdAt = $cheeseListing->getCreatedAt();
+        return $output;
+    }
 }
