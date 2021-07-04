@@ -6,15 +6,25 @@ use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use App\Dto\CheeseListingInput;
 use App\Entity\CheeseListing;
+use ApiPlatform\Core\Validator\ValidatorInterface;
 
 class CheeseListingInputDataTransformer implements DataTransformerInterface
 {
+
+  private $validator;
+
+  public function __construct(ValidatorInterface $validator)
+  {
+      $this->validator = $validator;
+  }
 
   /**
    * @param CheeseListingInput $input
    */
   public function transform($input, string $to, array $context = [])
   {
+      $this->validator->validate($input);
+      
       $cheeseListing = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? null;
       
       return $input->createOrUpdateEntity($cheeseListing);
