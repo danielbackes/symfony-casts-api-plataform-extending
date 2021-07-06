@@ -10,11 +10,13 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @ApiResource(
@@ -46,8 +48,16 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @ApiProperty(identifier=false)
      */
     private $id;
+
+    /**
+     * @ORM\Column(type="uuid", unique=true)
+     * @ApiProperty(identifier=true)
+     * @Groups({"user:write"})
+     */
+    private $uuid;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
@@ -110,9 +120,10 @@ class User implements UserInterface
      */
     private $isMvp = false;
 
-    public function __construct()
+    public function __construct(UuidInterface $uuid = null)
     {
         $this->cheeseListings = new ArrayCollection();
+        $this->uuid = $uuid ?: Uuid::uuid4();
     }
 
     public function getId(): ?int
@@ -285,5 +296,10 @@ class User implements UserInterface
     public function setIsMvp(bool $isMvp)
     {
         $this->isMvp = $isMvp;
-    }    
+    }  
+    
+    public function getUuid(): UuidInterface
+    {
+        return $this->uuid;
+    }
 }
